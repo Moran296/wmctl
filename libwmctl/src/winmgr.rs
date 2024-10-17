@@ -909,6 +909,36 @@ impl WinMgr {
         Ok(())
     }
 
+    /// focus the window and bring it to the front of the stacking order
+    ///
+    /// ### Arguments
+    /// * `id` - id of the window to manipulate
+    ///
+    /// ### Examples
+    /// ```ignore
+    /// use libwmctl::prelude::*;
+    /// let wm = WinMgr::connect().unwrap();
+    /// wm.focus_window(1234).unwrap();
+    /// ```
+    pub(crate) fn focus_window(&self, id: u32) -> WmCtlResult<()> {
+        self.send_event(ClientMessageEvent::new(
+            32,
+            id,
+            self.atoms._NET_ACTIVE_WINDOW,
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+            ],
+        ))?;
+
+        self.conn.configure_window(id, &ConfigureWindowAux::new().stack_mode(StackMode::ABOVE))?;
+        debug!("focus: id: {}", id);
+        Ok(())
+    }
+
     /// Remove the MaxVert and MaxHorz states
     ///
     /// ### Arguments
