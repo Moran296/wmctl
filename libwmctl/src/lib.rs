@@ -99,6 +99,38 @@ pub fn windows(hidden: bool) -> WmCtlResult<Vec<Window>> {
         .map(|&id| Ok(Window::new(id)))
         .collect::<WmCtlResult<Vec<Window>>>()
 }
+/// Retrieve a list of windows in the stacking order.
+///
+/// This function fetches the windows managed by the window manager in the order they are stacked
+/// on the screen. The stacking order represents the top-to-bottom layering of windows, where the
+/// first element in the list is the topmost window, and the last element is the bottommost.
+///
+/// The window manager maintains this order to manage which windows overlap others on the screen.
+///
+/// ### Returns
+/// A vector of `Window` objects representing the stacking order.
+///
+/// ### Errors
+/// Returns a `WmCtlError` if the `_NET_CLIENT_LIST_STACKING` property is not found
+/// or if there is a failure in querying the X11 server.
+///
+/// ### Examples
+/// ```ignore
+/// use libwmctl::prelude::*;
+/// let windows_in_stack_order = libwmctl::get_windows_by_stack_order().unwrap();
+/// for window in windows_in_stack_order {
+///     println!("Window ID: {}", window.id());
+/// }
+/// ```
+pub fn windows_by_stack_order() -> WmCtlResult<Vec<Window>> {
+    WM().read()
+        .unwrap()
+        .windows_by_stack_order()?
+        .iter()
+        .map(|&id| Ok(Window::new(id)))
+        .rev()
+        .collect::<WmCtlResult<Vec<Window>>>()
+}
 
 /// Get the first window that matches the given class
 ///

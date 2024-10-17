@@ -227,6 +227,18 @@ impl Window {
         WM().read().unwrap().maximize_window(self.id)
     }
 
+    /// Focus the window and bring it to the front of the stacking order
+    ///
+    /// ### Examples
+    /// ```ignore
+    /// use libwmctl::prelude::*;
+    /// let win = window(12345);
+    /// win.focus().unwrap();
+    /// ```
+    pub fn focus(&self) -> WmCtlResult<()> {
+        WM().read().unwrap().focus_window(self.id)
+    }
+
     /// Check if the window has a horizontally or vertically maximized
     ///
     /// ### Examples
