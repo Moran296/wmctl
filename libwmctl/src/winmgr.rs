@@ -361,6 +361,40 @@ impl WinMgr {
         })
     }
 
+    /// Retrieve the IDs of windows in the stacking order.
+    ///
+    /// This method gets the list of window IDs managed by the window manager, arranged according to
+    /// their stacking order. The stacking order represents the back-to-front layering of windows
+    /// on the screen, where the last window in the list is the frontmost (topmost) window.
+    ///
+    /// ### Returns
+    /// A vector of `u32` window IDs representing the stacking order.
+    ///
+    /// ### Errors
+    /// Returns a `WmCtlError` if the `_NET_CLIENT_LIST_STACKING` property is not found or
+    /// if there is a failure in querying the X11 server.
+    ///
+    /// ### Examples
+    /// ```ignore
+    /// use libwmctl::prelude::*;
+    /// let wm = WinMgr::connect().unwrap();
+    /// let stack_order = wm.windows_stack_order().unwrap();
+    /// for window_id in stack_order {
+    ///     println!("Window ID in stacking order: {}", window_id);
+    /// }
+    /// ```
+    pub(crate) fn windows_by_stack_order(&self) -> WmCtlResult<Vec<u32>> {
+        // All windows in the X11 system
+        let reply = self
+            .conn
+            .get_property(false, self.root, self.atoms._NET_CLIENT_LIST_STACKING, AtomEnum::WINDOW, 0, u32::MAX)?
+            .reply()?;
+        let children =
+            reply.value32().ok_or(WmCtlError::PropertyNotFound("_NET_CLIENT_LIST_STACKING".to_owned()))?;
+
+        Ok(children.collect::<Vec<_>>())
+    }
+
     /// Get window pid
     ///
     /// ### Arguments
