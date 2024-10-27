@@ -196,6 +196,26 @@ impl WinMgr {
         Ok(win)
     }
 
+    /// Get the active desktop id
+    ///
+    /// ### Examples
+    /// ```ignore
+    /// use libwmctl::prelude::*;
+    /// let wm = WinMgr::connect().unwrap();
+    /// wm.active_desktop().unwrap()
+    /// ```
+    pub(crate) fn active_desktop(&self) -> WmCtlResult<u32> {
+        let reply = self
+            .conn
+            .get_property(false, self.root, self.atoms._NET_CURRENT_DESKTOP, AtomEnum::CARDINAL, 0, u32::MAX)?
+            .reply()?;
+        let id = reply
+            .value32()
+            .and_then(|mut x| x.next())
+            .ok_or(WmCtlError::PropertyNotFound("_NET_CURRENT_DESKTOP".to_owned()))?;
+        Ok(id + 1)
+    }
+
     /// Get the Window Manager's supported functions.
     ///
     /// ### Examples

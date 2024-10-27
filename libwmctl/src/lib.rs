@@ -154,6 +154,18 @@ pub fn first_by_class(class: &str) -> Option<Window> {
         .map_or(None, |x| Some(x.clone()))
 }
 
+/// Get the active desktop
+/// id from 1 and up (like window desktop)
+///
+/// ### Examples
+/// ```ignore
+/// use libwmctl::prelude::*;
+/// let desktop_id = libwmctl::active_desktop();
+/// ```
+pub fn active_desktop() -> WmCtlResult<u32> {
+    WM().read().unwrap().active_desktop()
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
